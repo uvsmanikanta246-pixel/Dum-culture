@@ -1,0 +1,251 @@
+/* Custom Styles & Animation for Dum Culture Food Ordering */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --font-heading: 'Outfit', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+  --color-primary: #f59e0b;
+  --color-primary-hover: #d97706;
+  --color-accent: #ff6b35;
+  --color-dark-bg: #0d0f12;
+  --color-card-bg: #16191f;
+  --color-card-border: rgba(255, 255, 255, 0.08);
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-dark-bg);
+  color: #f3f4f6;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+h1, h2, h3, h4, .font-heading {
+  font-family: var(--font-heading);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0d0f12;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2e39;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #f59e0b;
+}
+
+/* Glassmorphism Classes */
+.glass-nav {
+  background: rgba(13, 15, 18, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card {
+  background: linear-gradient(135deg, rgba(26, 30, 38, 0.8) 0%, rgba(18, 21, 26, 0.95) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+}
+
+.glass-card:hover {
+  border-color: rgba(245, 158, 11, 0.35);
+  box-shadow: 0 15px 35px -10px rgba(245, 158, 11, 0.15);
+}
+
+.glass-drawer {
+  background: rgba(16, 19, 24, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ==========================================================================
+   LIGHTFALL ANIMATED BACKGROUND COMPONENT (WebGL Raymarching Shader)
+   ========================================================================== */
+
+.lightfall-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.lightfall-container.fixed-bg {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -10;
+  pointer-events: none;
+  background-color: #FAF8F5;
+}
+
+.lightfall-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  mix-blend-mode: multiply;
+  opacity: 0.85;
+}
+
+/* Lightfall Vignette Overlay */
+.lightfall-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 30%, transparent 25%, rgba(250, 248, 245, 0.5) 65%, #FAF8F5 100%);
+  pointer-events: none;
+}
+
+/* Animations */
+@keyframes pulse-subtle {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 3s ease-in-out infinite;
+}
+
+@keyframes badge-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.badge-shimmer {
+  background: linear-gradient(90deg, rgba(245,158,11,0.15) 0%, rgba(245,158,11,0.4) 50%, rgba(245,158,11,0.15) 100%);
+  background-size: 200% 100%;
+  animation: badge-shimmer 3s infinite;
+}
+
+/* Transitions */
+.drawer-backdrop {
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+}
+
+.drawer-panel {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Toast Notifications */
+#toast-container {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  transform: translateX(120%);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+}
+
+.toast.show {
+  transform: translateX(0);
+}
+
+/* Address Collapsible Transition */
+.collapsible-wrapper {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.3s ease-in-out, opacity 0.25s ease-in-out, margin 0.3s ease;
+  opacity: 1;
+}
+
+.collapsible-wrapper.collapsed {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  pointer-events: none;
+}
+
+.collapsible-inner {
+  overflow: hidden;
+}
+
+/* Button Tap Effects */
+.btn-press:active {
+  transform: scale(0.97);
+}
+
+/* WhatsApp Brand Glow */
+.wa-btn {
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  box-shadow: 0 4px 20px rgba(37, 211, 102, 0.35);
+  transition: all 0.25s ease;
+}
+
+.wa-btn:hover {
+  background: linear-gradient(135deg, #2ae06c 0%, #15a090 100%);
+  box-shadow: 0 6px 25px rgba(37, 211, 102, 0.5);
+  transform: translateY(-1px);
+}
+
+.wa-btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+/* ==========================================================================
+   THE ROYAL JOURNEY OF BIRYANI (Effects & Animations)
+   ========================================================================== */
+
+.royal-glow-text {
+  text-shadow: 0 0 35px rgba(245, 158, 11, 0.45);
+}
+
+.royal-card-glow {
+  box-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.7), 0 0 45px -10px rgba(245, 158, 11, 0.18);
+  transition: box-shadow 0.5s ease, border-color 0.5s ease;
+}
+
+.royal-card-glow:hover {
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 60px -5px rgba(245, 158, 11, 0.28);
+  border-color: rgba(245, 158, 11, 0.45);
+}
+
+.royal-img-container {
+  box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.6), 0 0 30px -5px rgba(245, 158, 11, 0.2);
+}
+
+/* Story Block Highlighting */
+.story-block {
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.story-block.active-chapter {
+  background: linear-gradient(90deg, rgba(245, 158, 11, 0.15) 0%, rgba(255, 107, 53, 0.08) 100%);
+  border-color: rgba(245, 158, 11, 0.55) !important;
+  box-shadow: 0 4px 20px -5px rgba(245, 158, 11, 0.25);
+  transform: translateX(6px);
+}
+
+.story-block.active-chapter p {
+  color: #fff !important;
+}
+
+/* Interactive Pillar Active State */
+.active-pillar {
+  border-color: rgba(245, 158, 11, 0.8) !important;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(217, 119, 6, 0.15) 100%) !important;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.35), inset 0 0 12px rgba(245, 158, 11, 0.2);
+  transform: translateY(-3px) scale(1.03);
+}
+

@@ -1,0 +1,13 @@
+{
+  "name": "dum-theory-whatsapp-ordering",
+  "version": "1.0.0",
+  "description": "WhatsApp Food Ordering Web App",
+  "main": "index.html",
+  "scripts": {
+    "start": "powershell -ExecutionPolicy Bypass -File ./server.ps1 -Port 8080",
+    "dev": "powershell -ExecutionPolicy Bypass -File ./server.ps1 -Port 8080"
+  },
+  "keywords": ["food-ordering", "whatsapp-checkout", "dum-biryani", "fry-piece-biryani"],
+  "author": "",
+  "license": "MIT"
+}

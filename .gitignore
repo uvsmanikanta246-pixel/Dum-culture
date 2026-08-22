@@ -1,0 +1,14 @@
+# Dependencies
+node_modules/
+
+# OS / Temporary Files
+.DS_Store
+Thumbs.db
+*.tmp
+*.log
+cookies.txt
+setup_git.ps1
+
+# Editor
+.vscode/
+.idea/

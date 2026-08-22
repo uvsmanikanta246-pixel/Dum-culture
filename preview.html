@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multi-Device Responsive Preview Studio | DUM CULTURE</title>
+  <link rel="icon" type="image/jpeg" href="assets/logo.jpg" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" />
+  
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #080a0e;
+      color: #f3f4f6;
+    }
+    .font-heading { font-family: 'Outfit', sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    
+    .glass-bar {
+      background: rgba(13, 16, 22, 0.9);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    /* Device Frames */
+    .device-shell {
+      background: #161920;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 28px;
+      padding: 12px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 30px rgba(245, 158, 11, 0.08);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    .device-shell:hover {
+      border-color: rgba(245, 158, 11, 0.4);
+      box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.9), 0 0 40px rgba(245, 158, 11, 0.15);
+    }
+    
+    .device-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 8px 10px 8px;
+      font-size: 12px;
+      color: #9ca3af;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      margin-bottom: 8px;
+    }
+    
+    .device-screen-wrapper {
+      border-radius: 18px;
+      overflow: hidden;
+      background: #000;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    
+    iframe {
+      border: none;
+      display: block;
+      background: #0d0f12;
+      width: 100%;
+      height: 100%;
+    }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #080a0e; }
+    ::-webkit-scrollbar-thumb { background: #222734; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #f59e0b; }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-black">
+
+  <!-- Top Controller Toolbar -->
+  <header class="sticky top-0 z-50 glass-bar px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-4 shadow-xl">
+    
+    <!-- Brand & Status -->
+    <div class="flex items-center gap-3">
+      <img src="assets/logo.jpg" alt="Logo" class="w-8 h-8 rounded-full border border-amber-500/40 object-cover" />
+      <div>
+        <div class="font-heading font-extrabold text-sm sm:text-base tracking-tight text-white flex items-center gap-2">
+          <span>DUM CULTURE</span>
+          <span class="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">Multi-Device Preview</span>
+        </div>
+        <div class="text-[11px] text-neutral-400">Live Responsive Testing Studio</div>
+      </div>
+    </div>
+
+    <!-- View Mode Selector & Controls -->
+    <div class="flex items-center flex-wrap gap-2 sm:gap-3">
+      
+      <!-- Layout Modes -->
+      <div class="flex items-center bg-neutral-900/90 rounded-xl p-1 border border-white/10 text-xs">
+        <button 
+          id="btn-mode-all" 
+          onclick="setViewMode('all')" 
+          class="px-3 py-1.5 rounded-lg font-semibold transition-all bg-amber-500 text-neutral-950 shadow-sm"
+        >
+          📱 Grid View (All Devices)
+        </button>
+        <button 
+          id="btn-mode-mobile" 
+          onclick="setViewMode('mobile')" 
+          class="px-3 py-1.5 rounded-lg font-semibold text-neutral-400 hover:text-white transition-all"
+        >
+          Mobile (iPhone)
+        </button>
+        <button 
+          id="btn-mode-tablet" 
+          onclick="setViewMode('tablet')" 
+          class="px-3 py-1.5 rounded-lg font-semibold text-neutral-400 hover:text-white transition-all"
+        >
+          Tablet (iPad)
+        </button>
+        <button 
+          id="btn-mode-desktop" 
+          onclick="setViewMode('desktop')" 
+          class="px-3 py-1.5 rounded-lg font-semibold text-neutral-400 hover:text-white transition-all"
+        >
+          Desktop
+        </button>
+      </div>
+
+      <!-- Orientation & Reload Actions -->
+      <div class="flex items-center gap-2">
+        <button 
+          onclick="toggleOrientation()" 
+          class="p-2 px-3 rounded-xl bg-neutral-900 border border-white/10 hover:border-amber-500/40 text-neutral-300 hover:text-white text-xs font-semibold flex items-center gap-1.5 transition-colors"
+          title="Rotate Orientation"
+        >
+          <span>🔄</span>
+          <span id="orientation-label">Portrait</span>
+        </button>
+        
+        <button 
+          onclick="reloadAllFrames()" 
+          class="p-2 px-3 rounded-xl bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 text-amber-300 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+          title="Reload All Frames"
+        >
+          <span>⚡</span>
+          <span>Refresh All</span>
+        </button>
+
+        <a 
+          href="index.html" 
+          target="_blank" 
+          class="p-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 text-xs font-bold flex items-center gap-1.5 transition-all shadow-md shadow-amber-500/20"
+        >
+          <span>Open Full Tab ↗</span>
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- WiFi / External Device Quick Connect Banner -->
+  <aside class="bg-neutral-950/70 border-b border-white/5 py-2.5 px-4 sm:px-6 text-xs text-neutral-400">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+        <span class="font-medium text-neutral-300">Live Local Server Active</span>
+        <span class="text-neutral-600">•</span>
+        <span>Local URL: <a href="http://localhost:8080" target="_blank" class="text-amber-400 font-mono hover:underline">http://localhost:8080</a></span>
+        <span class="text-neutral-600">•</span>
+        <span>Phone/Tablet Wi-Fi URL: <code class="text-emerald-400 font-mono bg-neutral-900 px-1.5 py-0.5 rounded border border-white/10 font-bold">http://192.168.29.30:8080</code></span>
+      </div>
+      <div class="text-[11px] text-neutral-400">
+        Tip: Open this Wi-Fi URL directly in Safari or Chrome on your phone to test live orders!
+      </div>
+    </div>
+  </aside>
+
+  <!-- Device Display Workspace Canvas -->
+  <main class="flex-1 p-4 sm:p-8 overflow-x-auto">
+    
+    <div id="device-container" class="flex flex-wrap items-start justify-center gap-8 min-w-max mx-auto py-4">
+      
+      <!-- 1. MOBILE DEVICE: iPhone 15 Pro (393 x 852) -->
+      <div id="device-card-mobile" class="device-shell transition-all duration-300">
+        <div class="device-header">
+          <div class="flex items-center gap-2">
+            <span class="text-amber-400 font-bold">📱 Mobile Viewport</span>
+            <span class="text-[10px] text-neutral-500">iPhone 15 Pro</span>
+          </div>
+          <span class="font-mono text-[10px] text-amber-400/90" id="res-mobile">393 × 852 px</span>
+        </div>
+        <div class="device-screen-wrapper" id="wrapper-mobile" style="width: 393px; height: 852px;">
+          <iframe id="frame-mobile" src="index.html" title="Mobile Preview"></iframe>
+        </div>
+      </div>
+
+      <!-- 2. COMPACT MOBILE: Android / Small Screen (360 x 740) -->
+      <div id="device-card-compact" class="device-shell transition-all duration-300">
+        <div class="device-header">
+          <div class="flex items-center gap-2">
+            <span class="text-amber-400 font-bold">📱 Compact Android</span>
+            <span class="text-[10px] text-neutral-500">Galaxy / Pixel</span>
+          </div>
+          <span class="font-mono text-[10px] text-amber-400/90" id="res-compact">360 × 740 px</span>
+        </div>
+        <div class="device-screen-wrapper" id="wrapper-compact" style="width: 360px; height: 740px;">
+          <iframe id="frame-compact" src="index.html" title="Compact Mobile Preview"></iframe>
+        </div>
+      </div>
+
+      <!-- 3. TABLET DEVICE: iPad Air (820 x 1000) -->
+      <div id="device-card-tablet" class="device-shell transition-all duration-300">
+        <div class="device-header">
+          <div class="flex items-center gap-2">
+            <span class="text-amber-400 font-bold">📟 Tablet Viewport</span>
+            <span class="text-[10px] text-neutral-500">iPad Air / Tablet</span>
+          </div>
+          <span class="font-mono text-[10px] text-amber-400/90" id="res-tablet">768 × 960 px</span>
+        </div>
+        <div class="device-screen-wrapper" id="wrapper-tablet" style="width: 768px; height: 960px;">
+          <iframe id="frame-tablet" src="index.html" title="Tablet Preview"></iframe>
+        </div>
+      </div>
+
+      <!-- 4. DESKTOP VIEWPORT: Laptop / Full HD (1100 x 800) -->
+      <div id="device-card-desktop" class="device-shell transition-all duration-300">
+        <div class="device-header">
+          <div class="flex items-center gap-2">
+            <span class="text-amber-400 font-bold">💻 Desktop Viewport</span>
+            <span class="text-[10px] text-neutral-500">MacBook / PC</span>
+          </div>
+          <span class="font-mono text-[10px] text-amber-400/90" id="res-desktop">1060 × 800 px</span>
+        </div>
+        <div class="device-screen-wrapper" id="wrapper-desktop" style="width: 1060px; height: 800px;">
+          <iframe id="frame-desktop" src="index.html" title="Desktop Preview"></iframe>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Interactive Controls Logic -->
+  <script>
+    let isLandscape = false;
+    let currentMode = 'all';
+
+    const devices = {
+      mobile: { w: 393, h: 852 },
+      compact: { w: 360, h: 740 },
+      tablet: { w: 768, h: 960 },
+      desktop: { w: 1060, h: 800 }
+    };
+
+    function setViewMode(mode) {
+      currentMode = mode;
+      
+      // Update Button Styles
+      const buttons = {
+        all: document.getElementById('btn-mode-all'),
+        mobile: document.getElementById('btn-mode-mobile'),
+        tablet: document.getElementById('btn-mode-tablet'),
+        desktop: document.getElementById('btn-mode-desktop')
+      };
+
+      Object.keys(buttons).forEach(k => {
+        if (k === mode) {
+          buttons[k].className = "px-3 py-1.5 rounded-lg font-semibold transition-all bg-amber-500 text-neutral-950 shadow-sm";
+        } else {
+          buttons[k].className = "px-3 py-1.5 rounded-lg font-semibold text-neutral-400 hover:text-white transition-all";
+        }
+      });
+
+      // Show / Hide Device Cards
+      const cards = {
+        mobile: document.getElementById('device-card-mobile'),
+        compact: document.getElementById('device-card-compact'),
+        tablet: document.getElementById('device-card-tablet'),
+        desktop: document.getElementById('device-card-desktop')
+      };
+
+      if (mode === 'all') {
+        Object.values(cards).forEach(c => c.style.display = 'flex');
+      } else if (mode === 'mobile') {
+        cards.mobile.style.display = 'flex';
+        cards.compact.style.display = 'flex';
+        cards.tablet.style.display = 'none';
+        cards.desktop.style.display = 'none';
+      } else if (mode === 'tablet') {
+        cards.mobile.style.display = 'none';
+        cards.compact.style.display = 'none';
+        cards.tablet.style.display = 'flex';
+        cards.desktop.style.display = 'none';
+      } else if (mode === 'desktop') {
+        cards.mobile.style.display = 'none';
+        cards.compact.style.display = 'none';
+        cards.tablet.style.display = 'none';
+        cards.desktop.style.display = 'flex';
+      }
+    }
+
+    function toggleOrientation() {
+      isLandscape = !isLandscape;
+      document.getElementById('orientation-label').textContent = isLandscape ? 'Landscape' : 'Portrait';
+
+      Object.keys(devices).forEach(key => {
+        const wrapper = document.getElementById(`wrapper-${key}`);
+        const resLabel = document.getElementById(`res-${key}`);
+        if (key === 'desktop') return; // keep desktop standard
+
+        const w = isLandscape ? devices[key].h : devices[key].w;
+        const h = isLandscape ? devices[key].w : devices[key].h;
+
+        wrapper.style.width = `${w}px`;
+        wrapper.style.height = `${h}px`;
+        resLabel.textContent = `${w} × ${h} px`;
+      });
+    }
+
+    function reloadAllFrames() {
+      ['mobile', 'compact', 'tablet', 'desktop'].forEach(key => {
+        const frame = document.getElementById(`frame-${key}`);
+        if (frame) {
+          frame.src = 'index.html?t=' + Date.now();
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>
