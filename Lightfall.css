@@ -12,13 +12,11 @@
   height: 100vh;
   z-index: -10;
   pointer-events: none;
-  background-color: #FAF7F2;
+  background-color: #060709;
 }
 
 .lightfall-container canvas {
   width: 100% !important;
   height: 100% !important;
   display: block;
-  mix-blend-mode: multiply;
-  opacity: 0.35;
 }
