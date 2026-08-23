@@ -13,7 +13,7 @@ const hexToRGB = hex => {
 };
 
 const prepColors = input => {
-  const base = (input && input.length ? input : ['#FFD700', '#F59E0B', '#FBBF24', '#D97706', '#EA580C', '#FDE68A']).slice(0, MAX_COLORS);
+  const base = (input && input.length ? input : ['#F59E0B', '#D97706', '#FBBF24', '#EA580C', '#B45309']).slice(0, MAX_COLORS);
   const count = base.length;
   const arr = [];
   for (let i = 0; i < MAX_COLORS; i++) arr.push(hexToRGB(base[Math.min(i, base.length - 1)]));
@@ -170,20 +170,20 @@ const Lightfall = ({
   className,
   dpr,
   paused = false,
-  colors = ['#FFD700', '#F59E0B', '#FBBF24', '#D97706', '#EA580C', '#FDE68A'],
-  backgroundColor = '#451A03',
-  speed = 0.35,
+  colors = ['#F59E0B', '#D97706', '#FBBF24', '#EA580C', '#B45309'],
+  backgroundColor = '#FAF7F2',
+  speed = 0.3,
   streakCount = 2,
-  streakWidth = 0.85,
-  streakLength = 1.1,
-  glow = 0.5,
-  density = 0.55,
-  twinkle = 0.5,
+  streakWidth = 0.75,
+  streakLength = 1.0,
+  glow = 0.35,
+  density = 0.5,
+  twinkle = 0.4,
   zoom = 3,
-  backgroundGlow = 0.18,
-  opacity = 0.75,
+  backgroundGlow = 0.05,
+  opacity = 0.35,
   mouseInteraction = true,
-  mouseStrength = 0.25,
+  mouseStrength = 0.2,
   mouseRadius = 1,
   mouseDampening = 0.15,
   mixBlendMode

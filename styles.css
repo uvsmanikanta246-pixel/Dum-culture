@@ -1,4 +1,4 @@
-/* Custom Styles & Animation for Dum Culture Food Ordering (Luxury Black & Gold Theme) */
+/* Custom Styles & Animation for Dum Culture Food Ordering (Milky-White Luxury Theme) */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
@@ -7,15 +7,18 @@
   --color-primary: #f59e0b;
   --color-primary-hover: #d97706;
   --color-accent: #ff6b35;
-  --color-dark-bg: #0d0f12;
-  --color-card-bg: #16191f;
-  --color-card-border: rgba(255, 255, 255, 0.08);
+  --color-milky-bg: #FAF7F2;
+  --color-nav-bg: #F0EBE3;
+  --color-card-bg: #FFFFFF;
+  --color-text-main: #2A2420;
+  --color-text-muted: #5A534C;
+  --color-card-border: rgba(42, 36, 32, 0.08);
 }
 
 body {
   font-family: var(--font-body);
-  background-color: var(--color-dark-bg);
-  color: #f3f4f6;
+  background-color: var(--color-milky-bg);
+  color: var(--color-text-main);
   overflow-x: hidden;
   scroll-behavior: smooth;
 }
@@ -30,42 +33,42 @@ h1, h2, h3, h4, .font-heading {
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #0d0f12;
+  background: #FAF7F2;
 }
 ::-webkit-scrollbar-thumb {
-  background: #2a2e39;
+  background: #D8D1C7;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #f59e0b;
+  background: #F59E0B;
 }
 
-/* Glassmorphism Classes (Luxury Dark Theme) */
+/* Glassmorphism Classes (Light Milky-White Luxury) */
 .glass-nav {
-  background: rgba(13, 15, 18, 0.85);
+  background: rgba(250, 247, 242, 0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(42, 36, 32, 0.08);
 }
 
 .glass-card {
-  background: linear-gradient(135deg, rgba(26, 30, 38, 0.85) 0%, rgba(18, 21, 26, 0.95) 100%);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(42, 36, 32, 0.08);
+  box-shadow: 0 10px 30px -10px rgba(42, 36, 32, 0.06);
 }
 
 .glass-card:hover {
-  border-color: rgba(245, 158, 11, 0.35);
+  border-color: rgba(245, 158, 11, 0.4);
   box-shadow: 0 15px 35px -10px rgba(245, 158, 11, 0.15);
 }
 
 .glass-drawer {
-  background: rgba(16, 19, 24, 0.98);
+  background: #FAF7F2;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  border-left: 1px solid rgba(42, 36, 32, 0.1);
 }
 
 /* ==========================================================================
@@ -86,21 +89,22 @@ h1, h2, h3, h4, .font-heading {
   height: 100vh;
   z-index: -10;
   pointer-events: none;
-  background-color: #060709;
+  background-color: #FAF7F2;
 }
 
 .lightfall-container canvas {
   width: 100% !important;
   height: 100% !important;
   display: block;
-  opacity: 0.85;
+  mix-blend-mode: multiply;
+  opacity: 0.35;
 }
 
 /* Lightfall Vignette Overlay */
 .lightfall-vignette {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 50% 30%, transparent 35%, rgba(6, 7, 9, 0.75) 75%, #060709 100%);
+  background: radial-gradient(circle at 50% 30%, transparent 40%, rgba(250, 247, 242, 0.6) 75%, #FAF7F2 100%);
   pointer-events: none;
 }
 
@@ -203,25 +207,25 @@ h1, h2, h3, h4, .font-heading {
 }
 
 /* ==========================================================================
-   THE ROYAL JOURNEY OF BIRYANI (Effects & Animations - Black & Gold Theme)
+   THE ROYAL JOURNEY OF BIRYANI (Effects & Animations - Milky White Theme)
    ========================================================================== */
 
 .royal-glow-text {
-  text-shadow: 0 0 35px rgba(245, 158, 11, 0.45);
+  text-shadow: 0 0 25px rgba(245, 158, 11, 0.25);
 }
 
 .royal-card-glow {
-  box-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.7), 0 0 45px -10px rgba(245, 158, 11, 0.18);
+  box-shadow: 0 20px 50px -15px rgba(42, 36, 32, 0.08), 0 0 35px -10px rgba(245, 158, 11, 0.12);
   transition: box-shadow 0.5s ease, border-color 0.5s ease;
 }
 
 .royal-card-glow:hover {
-  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 60px -5px rgba(245, 158, 11, 0.28);
+  box-shadow: 0 25px 60px -15px rgba(42, 36, 32, 0.12), 0 0 45px -5px rgba(245, 158, 11, 0.2);
   border-color: rgba(245, 158, 11, 0.45);
 }
 
 .royal-img-container {
-  box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.6), 0 0 30px -5px rgba(245, 158, 11, 0.2);
+  box-shadow: 0 15px 35px -10px rgba(42, 36, 32, 0.15), 0 0 25px -5px rgba(245, 158, 11, 0.15);
 }
 
 /* Story Block Highlighting */
@@ -230,20 +234,20 @@ h1, h2, h3, h4, .font-heading {
 }
 
 .story-block.active-chapter {
-  background: linear-gradient(90deg, rgba(245, 158, 11, 0.15) 0%, rgba(255, 107, 53, 0.08) 100%);
-  border-color: rgba(245, 158, 11, 0.55) !important;
-  box-shadow: 0 4px 20px -5px rgba(245, 158, 11, 0.25);
+  background: linear-gradient(90deg, rgba(245, 158, 11, 0.12) 0%, rgba(255, 107, 53, 0.05) 100%);
+  border-color: rgba(245, 158, 11, 0.5) !important;
+  box-shadow: 0 4px 20px -5px rgba(245, 158, 11, 0.15);
   transform: translateX(6px);
 }
 
 .story-block.active-chapter p {
-  color: #fff !important;
+  color: #1F1B18 !important;
 }
 
 /* Interactive Pillar Active State */
 .active-pillar {
   border-color: rgba(245, 158, 11, 0.8) !important;
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(217, 119, 6, 0.15) 100%) !important;
-  box-shadow: 0 0 20px rgba(245, 158, 11, 0.35), inset 0 0 12px rgba(245, 158, 11, 0.2);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.18) 0%, rgba(217, 119, 6, 0.1) 100%) !important;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.25), inset 0 0 10px rgba(245, 158, 11, 0.1);
   transform: translateY(-3px) scale(1.03);
 }
