@@ -14,7 +14,7 @@ const hexToRGB = hex => {
 };
 
 const prepColors = input => {
-  const base = (input && input.length ? input : ['#F59E0B', '#D97706', '#FBBF24', '#EA580C', '#B45309']).slice(0, MAX_COLORS);
+  const base = (input && input.length ? input : ['#FFD700', '#F59E0B', '#FBBF24', '#D97706', '#EA580C', '#FDE68A']).slice(0, MAX_COLORS);
   const count = base.length;
   const arr = [];
   for (let i = 0; i < MAX_COLORS; i++) {
@@ -202,20 +202,20 @@ export function initLightfall(container, userOptions = {}) {
   if (!container) return null;
 
   const options = {
-    colors: ['#F59E0B', '#D97706', '#FBBF24', '#EA580C', '#B45309'],
-    backgroundColor: '#FAF7F2',
-    speed: 0.3,
+    colors: ['#FFD700', '#F59E0B', '#FBBF24', '#D97706', '#EA580C', '#FDE68A'],
+    backgroundColor: '#451A03',
+    speed: 0.35,
     streakCount: 2,
-    streakWidth: 0.75,
-    streakLength: 1.0,
-    glow: 0.35,
-    density: 0.5,
-    twinkle: 0.4,
+    streakWidth: 0.85,
+    streakLength: 1.1,
+    glow: 0.5,
+    density: 0.55,
+    twinkle: 0.5,
     zoom: 3,
-    backgroundGlow: 0.05,
-    opacity: 0.35,
+    backgroundGlow: 0.18,
+    opacity: 0.75,
     mouseInteraction: true,
-    mouseStrength: 0.2,
+    mouseStrength: 0.25,
     mouseRadius: 1.0,
     mouseDampening: 0.15,
     paused: false,
@@ -442,20 +442,20 @@ if (typeof document !== 'undefined') {
     const el = document.getElementById('lightfall-bg');
     if (el) {
       initLightfall(el, {
-        colors: ['#F59E0B', '#D97706', '#FBBF24', '#EA580C', '#B45309'],
-        backgroundColor: '#FAF7F2',
-        speed: 0.3,
+        colors: ['#FFD700', '#F59E0B', '#FBBF24', '#D97706', '#EA580C', '#FDE68A'],
+        backgroundColor: '#451A03',
+        speed: 0.35,
         streakCount: 2,
-        streakWidth: 0.75,
-        streakLength: 1.0,
-        glow: 0.35,
-        density: 0.5,
-        twinkle: 0.4,
+        streakWidth: 0.85,
+        streakLength: 1.1,
+        glow: 0.5,
+        density: 0.55,
+        twinkle: 0.5,
         zoom: 3,
-        backgroundGlow: 0.05,
-        opacity: 0.35,
+        backgroundGlow: 0.18,
+        opacity: 0.75,
         mouseInteraction: true,
-        mouseStrength: 0.2,
+        mouseStrength: 0.25,
         mouseRadius: 1.0,
         mouseDampening: 0.15
       });

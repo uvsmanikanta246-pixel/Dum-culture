@@ -115,24 +115,24 @@ function renderMenu() {
   DOM.menuContainer.innerHTML = MENU_ITEMS.map((item) => {
     const qty = state.menuCardQuantities[item.id] || 1;
     return `
-      <article class="bg-white rounded-2xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1.5 group border border-neutral-200 shadow-sm hover:shadow-xl" id="card-${item.id}">
+      <article class="glass-card rounded-2xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1.5 group border border-white/10" id="card-${item.id}">
         <!-- Food Image Container -->
-        <div class="relative h-60 w-full overflow-hidden bg-neutral-100">
+        <div class="relative h-60 w-full overflow-hidden bg-neutral-900">
           <img 
             src="${item.image}" 
             alt="${item.name}" 
             class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
             loading="lazy"
           />
-          <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none"></div>
+          <div class="absolute inset-0 bg-gradient-to-t from-[#12151a] via-transparent to-black/20 pointer-events-none"></div>
           
           <!-- Badge -->
-          <span class="absolute top-3.5 left-3.5 px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-md bg-white/90 text-amber-800 border border-amber-300 shadow-sm">
+          <span class="absolute top-3.5 left-3.5 px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-md border ${item.tagClass}">
             ${item.tag}
           </span>
           
           <!-- Calorie / Info Badge -->
-          <span class="absolute top-3.5 right-3.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-black/60 backdrop-blur-md text-white border border-white/20">
+          <span class="absolute top-3.5 right-3.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-black/60 backdrop-blur-md text-neutral-300 border border-white/10">
             ${item.calories}
           </span>
 
@@ -145,34 +145,34 @@ function renderMenu() {
         <!-- Content Details -->
         <div class="p-6 flex-1 flex flex-col justify-between">
           <div>
-            <h3 class="text-xl font-bold text-[#2A2420] mb-2 font-heading group-hover:text-amber-600 transition-colors">
+            <h3 class="text-xl font-bold text-white mb-2 font-heading group-hover:text-amber-400 transition-colors">
               ${item.name}
             </h3>
-            <p class="text-[#5A534C] text-sm leading-relaxed mb-6 line-clamp-3">
+            <p class="text-neutral-400 text-sm leading-relaxed mb-6 line-clamp-3">
               ${item.description}
             </p>
           </div>
 
           <!-- Card Actions (Quantity selector + Add button) -->
-          <div class="pt-4 border-t border-neutral-100 flex items-center justify-between gap-3">
+          <div class="pt-4 border-t border-white/5 flex items-center justify-between gap-3">
             <!-- Counter -->
-            <div class="flex items-center bg-neutral-100 rounded-xl p-1 border border-neutral-200">
+            <div class="flex items-center bg-neutral-800/90 rounded-xl p-1 border border-white/10">
               <button 
                 type="button"
                 onclick="changeMenuQty('${item.id}', -1)"
                 aria-label="Decrease quantity for ${item.name}"
-                class="w-8 h-8 flex items-center justify-center rounded-lg text-neutral-700 hover:text-neutral-950 hover:bg-neutral-200 transition-colors btn-press text-lg font-bold"
+                class="w-8 h-8 flex items-center justify-center rounded-lg text-neutral-300 hover:text-white hover:bg-neutral-700/80 transition-colors btn-press text-lg font-bold"
               >
                 -
               </button>
-              <span id="qty-${item.id}" class="w-8 text-center font-bold text-sm text-[#2A2420] font-heading select-none">
+              <span id="qty-${item.id}" class="w-8 text-center font-bold text-sm text-white font-heading select-none">
                 ${qty}
               </span>
               <button 
                 type="button"
                 onclick="changeMenuQty('${item.id}', 1)"
                 aria-label="Increase quantity for ${item.name}"
-                class="w-8 h-8 flex items-center justify-center rounded-lg text-neutral-700 hover:text-neutral-950 hover:bg-neutral-200 transition-colors btn-press text-lg font-bold"
+                class="w-8 h-8 flex items-center justify-center rounded-lg text-neutral-300 hover:text-white hover:bg-neutral-700/80 transition-colors btn-press text-lg font-bold"
               >
                 +
               </button>
@@ -361,29 +361,29 @@ function updateCartUI() {
           if (!item || qty <= 0) return "";
           const itemTotal = (item.price * qty).toFixed(2);
           return `
-            <li class="flex items-center gap-3.5 p-3 rounded-xl bg-white border border-neutral-200 group hover:border-amber-400/60 shadow-sm transition-all">
+            <li class="flex items-center gap-3.5 p-3 rounded-xl bg-neutral-900/80 border border-white/5 group hover:border-white/15 transition-all">
               <img src="${item.image}" alt="${item.name}" class="w-16 h-16 rounded-lg object-cover flex-shrink-0" />
               <div class="flex-1 min-w-0">
-                <h4 class="font-bold text-sm text-[#2A2420] truncate font-heading">${item.name}</h4>
-                <div class="text-xs text-[#5A534C] mt-0.5">${CONFIG.currencySymbol}${item.price.toFixed(2)} each</div>
-                <div class="text-amber-700 font-extrabold text-sm mt-1">${CONFIG.currencySymbol}${itemTotal}</div>
+                <h4 class="font-bold text-sm text-white truncate font-heading">${item.name}</h4>
+                <div class="text-xs text-neutral-400 mt-0.5">${CONFIG.currencySymbol}${item.price.toFixed(2)} each</div>
+                <div class="text-amber-400 font-extrabold text-sm mt-1">${CONFIG.currencySymbol}${itemTotal}</div>
               </div>
               
               <!-- Quantity Modifier -->
-              <div class="flex items-center gap-1 bg-neutral-100 rounded-lg p-1 border border-neutral-200">
+              <div class="flex items-center gap-1 bg-neutral-800 rounded-lg p-1 border border-white/10">
                 <button 
                   type="button" 
                   onclick="updateCartItemQty('${item.id}', -1)"
-                  class="w-7 h-7 rounded flex items-center justify-center text-neutral-700 hover:text-neutral-950 hover:bg-neutral-200 text-sm font-bold btn-press"
+                  class="w-7 h-7 rounded flex items-center justify-center text-neutral-300 hover:text-white hover:bg-neutral-700 text-sm font-bold btn-press"
                   aria-label="Decrease quantity"
                 >
                   -
                 </button>
-                <span class="w-6 text-center text-xs font-bold text-[#2A2420] select-none">${qty}</span>
+                <span class="w-6 text-center text-xs font-bold text-white select-none">${qty}</span>
                 <button 
                   type="button" 
                   onclick="updateCartItemQty('${item.id}', 1)"
-                  class="w-7 h-7 rounded flex items-center justify-center text-neutral-700 hover:text-neutral-950 hover:bg-neutral-200 text-sm font-bold btn-press"
+                  class="w-7 h-7 rounded flex items-center justify-center text-neutral-300 hover:text-white hover:bg-neutral-700 text-sm font-bold btn-press"
                   aria-label="Increase quantity"
                 >
                   +
@@ -394,7 +394,7 @@ function updateCartUI() {
               <button 
                 type="button" 
                 onclick="removeCartItem('${item.id}')"
-                class="text-neutral-400 hover:text-red-600 p-1.5 rounded-lg hover:bg-red-50 transition-colors"
+                class="text-neutral-500 hover:text-red-400 p-1.5 rounded-lg hover:bg-red-500/10 transition-colors"
                 title="Remove item"
                 aria-label="Remove ${item.name}"
               >
@@ -460,15 +460,15 @@ function updateFulfillmentUI() {
   const deliveryCard = document.getElementById("option-card-delivery");
   if (pickupCard && deliveryCard) {
     if (isDelivery) {
-      deliveryCard.classList.add("border-amber-500", "bg-amber-50");
-      deliveryCard.classList.remove("border-neutral-200", "bg-white");
-      pickupCard.classList.remove("border-amber-500", "bg-amber-50");
-      pickupCard.classList.add("border-neutral-200", "bg-white");
+      deliveryCard.classList.add("border-amber-500", "bg-amber-500/10");
+      deliveryCard.classList.remove("border-white/10", "bg-neutral-900/60");
+      pickupCard.classList.remove("border-amber-500", "bg-amber-500/10");
+      pickupCard.classList.add("border-white/10", "bg-neutral-900/60");
     } else {
-      pickupCard.classList.add("border-amber-500", "bg-amber-50");
-      pickupCard.classList.remove("border-neutral-200", "bg-white");
-      deliveryCard.classList.remove("border-amber-500", "bg-amber-50");
-      deliveryCard.classList.add("border-neutral-200", "bg-white");
+      pickupCard.classList.add("border-amber-500", "bg-amber-500/10");
+      pickupCard.classList.remove("border-white/10", "bg-neutral-900/60");
+      deliveryCard.classList.remove("border-amber-500", "bg-amber-500/10");
+      deliveryCard.classList.add("border-white/10", "bg-neutral-900/60");
     }
   }
 
@@ -635,18 +635,18 @@ function openSuccessModal(order) {
   
   if (DOM.orderSummaryRecap) {
     DOM.orderSummaryRecap.innerHTML = `
-      <div class="bg-neutral-50 rounded-xl p-4 border border-neutral-200 text-left space-y-2 text-sm text-[#2A2420]">
-        <div class="flex justify-between border-b border-neutral-200/80 pb-2">
-          <span class="text-[#5A534C]">Customer:</span>
-          <span class="font-bold text-[#2A2420]">${order.name}</span>
+      <div class="bg-neutral-900/90 rounded-xl p-4 border border-white/10 text-left space-y-2 text-sm text-neutral-300">
+        <div class="flex justify-between border-b border-white/5 pb-2">
+          <span class="text-neutral-400">Customer:</span>
+          <span class="font-bold text-white">${order.name}</span>
         </div>
-        <div class="flex justify-between border-b border-neutral-200/80 pb-2">
-          <span class="text-[#5A534C]">Fulfillment:</span>
-          <span class="font-bold text-amber-700">${order.fulfillment}</span>
+        <div class="flex justify-between border-b border-white/5 pb-2">
+          <span class="text-neutral-400">Fulfillment:</span>
+          <span class="font-bold text-amber-400">${order.fulfillment}</span>
         </div>
         <div class="flex justify-between text-base pt-1">
-          <span class="text-[#2A2420] font-bold">Total:</span>
-          <span class="font-extrabold text-amber-600">${order.total}</span>
+          <span class="text-white font-bold">Total:</span>
+          <span class="font-extrabold text-amber-400">${order.total}</span>
         </div>
       </div>
     `;
@@ -726,9 +726,9 @@ function showToast(message, type = "info") {
   };
 
   const bgBorder = {
-    success: "bg-white border-emerald-300 text-[#2A2420] shadow-lg",
-    error: "bg-white border-red-300 text-[#2A2420] shadow-lg",
-    info: "bg-white border-amber-300 text-[#2A2420] shadow-lg"
+    success: "bg-neutral-900/95 border-emerald-500/40 text-neutral-100",
+    error: "bg-neutral-900/95 border-red-500/40 text-neutral-100",
+    info: "bg-neutral-900/95 border-amber-500/40 text-neutral-100"
   };
 
   toast.className = `toast flex items-center gap-3 px-4 py-3 rounded-xl border shadow-xl backdrop-blur-md text-sm font-medium ${bgBorder[type] || bgBorder.info}`;
