@@ -1375,25 +1375,3 @@ function attachEventListeners() {
     }
   });
 }
-
-/**
- * Interactive Royal Journey Story Chapter Selector
- */
-window.selectJourneyChapter = function(chapterNumber) {
-  for (let i = 1; i <= 4; i++) {
-    const chapterEl = document.getElementById(`story-chapter-${i}`);
-    const btnEl = document.getElementById(`pillar-btn-${i}`);
-    if (chapterEl) chapterEl.classList.remove("active-chapter");
-    if (btnEl) btnEl.classList.remove("active-pillar");
-  }
-
-  const targetChapter = document.getElementById(`story-chapter-${chapterNumber}`);
-  if (targetChapter) {
-    targetChapter.classList.add("active-chapter");
-  }
-
-  const targetBtn = document.getElementById(`pillar-btn-${chapterNumber}`);
-  if (targetBtn) {
-    targetBtn.classList.add("active-pillar");
-  }
-};

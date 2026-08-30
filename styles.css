@@ -202,51 +202,6 @@ h1, h2, h3, h4, .font-heading {
   transform: translateY(1px) scale(0.98);
 }
 
-/* ==========================================================================
-   THE ROYAL JOURNEY OF BIRYANI (Effects & Animations - Black & Gold Theme)
-   ========================================================================== */
-
-.royal-glow-text {
-  text-shadow: 0 0 35px rgba(245, 158, 11, 0.45);
-}
-
-.royal-card-glow {
-  box-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.7), 0 0 45px -10px rgba(245, 158, 11, 0.18);
-  transition: box-shadow 0.5s ease, border-color 0.5s ease;
-}
-
-.royal-card-glow:hover {
-  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 60px -5px rgba(245, 158, 11, 0.28);
-  border-color: rgba(245, 158, 11, 0.45);
-}
-
-.royal-img-container {
-  box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.6), 0 0 30px -5px rgba(245, 158, 11, 0.2);
-}
-
-/* Story Block Highlighting */
-.story-block {
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.story-block.active-chapter {
-  background: linear-gradient(90deg, rgba(245, 158, 11, 0.15) 0%, rgba(255, 107, 53, 0.08) 100%);
-  border-color: rgba(245, 158, 11, 0.55) !important;
-  box-shadow: 0 4px 20px -5px rgba(245, 158, 11, 0.25);
-  transform: translateX(6px);
-}
-
-.story-block.active-chapter p {
-  color: #fff !important;
-}
-
-/* Interactive Pillar Active State */
-.active-pillar {
-  border-color: rgba(245, 158, 11, 0.8) !important;
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(217, 119, 6, 0.15) 100%) !important;
-  box-shadow: 0 0 20px rgba(245, 158, 11, 0.35), inset 0 0 12px rgba(245, 158, 11, 0.2);
-  transform: translateY(-3px) scale(1.03);
-}
 
 /* ==========================================================================
    FIREBASE AUTHENTICATION & USER PROFILE STYLES
