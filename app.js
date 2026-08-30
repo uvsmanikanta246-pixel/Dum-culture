@@ -1,12 +1,21 @@
 /**
- * DUM CULTURE - WhatsApp Food Ordering Engine
- * Single-Page Conversion Focused Web Application
+ * DUM CULTURE - Food Ordering Engine & Firebase Integration
+ * Google Authentication, Firestore Users & Orders Management
  */
+
+import { 
+  loginWithGoogle, 
+  logoutUser, 
+  subscribeToAuthState, 
+  getUserProfile, 
+  saveUserProfile, 
+  saveOrderToFirestore, 
+  getUserOrders 
+} from "./firebase.js";
 
 // Global Configuration
 const CONFIG = {
   restaurantName: "Dum Culture",
-  // Default WhatsApp phone number (International format without '+' or spaces, e.g. 1234567890 or 919030243334)
   defaultWhatsappNumber: "+919030243334",
   deliveryFee: 10.00,
   currencySymbol: "₹",
@@ -14,7 +23,7 @@ const CONFIG = {
   estimatedDeliveryTime: "25-35 mins"
 };
 
-// Menu Data (Limited Curated Menu - 2 Signature Biryanis)
+// Menu Data (Signature Biryanis)
 const MENU_ITEMS = [
   {
     id: "dum_biryani",
@@ -40,6 +49,8 @@ const MENU_ITEMS = [
 
 // Application State
 const state = {
+  user: null, // Firebase Auth User
+  userProfile: null, // Firestore Document Data
   cart: {}, // { [itemId]: quantity }
   menuCardQuantities: {
     dum_biryani: 1,
@@ -55,10 +66,10 @@ const state = {
   }
 };
 
-// DOM References
+// DOM Cache
 const DOM = {};
 
-// Initialize on DOM Ready
+// Initialize Application
 document.addEventListener("DOMContentLoaded", () => {
   cacheDOM();
   renderMenu();
@@ -66,9 +77,14 @@ document.addEventListener("DOMContentLoaded", () => {
   updateFulfillmentUI();
   updateCartUI();
   renderConfigUI();
+  initAuthObserver();
 });
 
+/**
+ * Cache all DOM elements
+ */
 function cacheDOM() {
+  // Menu & Cart Drawer
   DOM.menuContainer = document.getElementById("menu-container");
   DOM.cartDrawer = document.getElementById("cart-drawer");
   DOM.cartBackdrop = document.getElementById("cart-backdrop");
@@ -80,7 +96,7 @@ function cacheDOM() {
   DOM.cartTotalBadges = document.querySelectorAll(".cart-total-badge");
   DOM.floatingCartBtn = document.getElementById("floating-cart-btn");
   
-  // Fulfillment
+  // Fulfillment & Totals
   DOM.pickupRadio = document.getElementById("fulfillment-pickup");
   DOM.deliveryRadio = document.getElementById("fulfillment-delivery");
   DOM.deliveryAddressWrapper = document.getElementById("delivery-address-wrapper");
@@ -90,13 +106,52 @@ function cacheDOM() {
   DOM.drawerDeliveryFee = document.getElementById("drawer-delivery-fee");
   DOM.drawerTotal = document.getElementById("drawer-total");
   
-  // Customer Inputs
+  // Customer Inputs in Drawer
   DOM.customerName = document.getElementById("customer-name");
   DOM.customerPhone = document.getElementById("customer-phone");
   DOM.customerNotes = document.getElementById("customer-notes");
   DOM.placeOrderBtn = document.getElementById("place-order-btn");
   
-  // Modals & UI
+  // Navigation Auth Elements
+  DOM.navLoginBtn = document.getElementById("nav-login-btn");
+  DOM.navUserContainer = document.getElementById("nav-user-container");
+  DOM.navUserAvatar = document.getElementById("nav-user-avatar");
+  DOM.navUserName = document.getElementById("nav-user-name");
+  DOM.userDropdownMenu = document.getElementById("user-dropdown-menu");
+  DOM.dropdownUserName = document.getElementById("dropdown-user-name");
+  DOM.dropdownUserEmail = document.getElementById("dropdown-user-email");
+  
+  // Modals & Popups
+  DOM.authModal = document.getElementById("auth-modal");
+  DOM.googleSigninBtn = document.getElementById("google-signin-btn");
+  DOM.googleBtnText = document.getElementById("google-btn-text");
+  DOM.googleBtnSpinner = document.getElementById("google-btn-spinner");
+  
+  // Profile Completion Modal
+  DOM.profileCompletionModal = document.getElementById("profile-completion-modal");
+  DOM.compFullName = document.getElementById("comp-fullname");
+  DOM.compPhone = document.getElementById("comp-phone");
+  DOM.compAddress = document.getElementById("comp-address");
+  DOM.compSubmitBtn = document.getElementById("comp-submit-btn");
+  DOM.compSpinner = document.getElementById("comp-spinner");
+  
+  // My Profile Modal
+  DOM.profileModal = document.getElementById("profile-modal");
+  DOM.profFullName = document.getElementById("prof-fullname");
+  DOM.profPhone = document.getElementById("prof-phone");
+  DOM.profAddress = document.getElementById("prof-address");
+  DOM.profAvatar = document.getElementById("profile-modal-avatar");
+  DOM.profEmail = document.getElementById("profile-modal-email");
+  DOM.profSaveBtn = document.getElementById("prof-save-btn");
+  DOM.profSpinner = document.getElementById("prof-spinner");
+  
+  // My Orders Modal
+  DOM.ordersModal = document.getElementById("orders-modal");
+  DOM.ordersLoading = document.getElementById("orders-loading");
+  DOM.ordersEmpty = document.getElementById("orders-empty");
+  DOM.ordersList = document.getElementById("orders-list");
+
+  // WhatsApp Config & Confirmation Modals
   DOM.whatsappSettingsModal = document.getElementById("whatsapp-settings-modal");
   DOM.whatsappNumberInput = document.getElementById("whatsapp-number-input");
   DOM.currentWhatsappDisplay = document.getElementById("current-whatsapp-display");
@@ -106,8 +161,485 @@ function cacheDOM() {
   DOM.messagePreviewDrawer = document.getElementById("message-preview-content");
 }
 
+/* ==========================================================================
+   FIREBASE AUTHENTICATION & PROFILE ENGINE
+   ========================================================================== */
+
 /**
- * Render Curated Menu Items
+ * Listen for Firebase Auth state changes (Session Persistence)
+ */
+function initAuthObserver() {
+  subscribeToAuthState(async (user) => {
+    if (user) {
+      state.user = user;
+      updateNavForLoggedInUser(user);
+
+      // Fetch user profile from Firestore
+      const profileResult = await getUserProfile(user.uid);
+      if (profileResult.success && profileResult.exists && profileResult.data) {
+        state.userProfile = profileResult.data;
+        
+        // Auto-fill customer details into checkout drawer
+        if (state.userProfile.fullName && !state.customer.name) {
+          state.customer.name = state.userProfile.fullName;
+          if (DOM.customerName) DOM.customerName.value = state.userProfile.fullName;
+        }
+        if (state.userProfile.phoneNumber && !state.customer.phone) {
+          state.customer.phone = state.userProfile.phoneNumber;
+          if (DOM.customerPhone) DOM.customerPhone.value = state.userProfile.phoneNumber;
+        }
+        if (state.userProfile.deliveryAddress && !state.customer.address) {
+          state.customer.address = state.userProfile.deliveryAddress;
+          if (DOM.deliveryAddressInput) DOM.deliveryAddressInput.value = state.userProfile.deliveryAddress;
+        }
+        updateLivePreview();
+
+        // If profile is incomplete (missing phone or address), prompt completion
+        if (!state.userProfile.phoneNumber || !state.userProfile.deliveryAddress) {
+          openProfileCompletionModal(user, state.userProfile);
+        }
+      } else {
+        // First login: profile does not exist yet
+        openProfileCompletionModal(user, null);
+      }
+    } else {
+      state.user = null;
+      state.userProfile = null;
+      updateNavForLoggedOutUser();
+    }
+  });
+}
+
+/**
+ * Update UI for logged in user
+ */
+function updateNavForLoggedInUser(user) {
+  if (DOM.navLoginBtn) DOM.navLoginBtn.classList.add("hidden");
+  if (DOM.navUserContainer) DOM.navUserContainer.classList.remove("hidden");
+
+  const displayName = user.displayName || user.email?.split("@")[0] || "Account";
+  const photoUrl = user.photoURL || "assets/logo.jpg";
+
+  if (DOM.navUserName) DOM.navUserName.textContent = displayName.split(" ")[0];
+  if (DOM.navUserAvatar) DOM.navUserAvatar.src = photoUrl;
+  if (DOM.dropdownUserName) DOM.dropdownUserName.textContent = displayName;
+  if (DOM.dropdownUserEmail) DOM.dropdownUserEmail.textContent = user.email || "";
+}
+
+/**
+ * Update UI for logged out user
+ */
+function updateNavForLoggedOutUser() {
+  if (DOM.navLoginBtn) DOM.navLoginBtn.classList.remove("hidden");
+  if (DOM.navUserContainer) DOM.navUserContainer.classList.add("hidden");
+  toggleUserDropdown(false);
+}
+
+/**
+ * Auth Modal Controls
+ */
+window.openAuthModal = function() {
+  if (DOM.authModal) {
+    DOM.authModal.classList.remove("hidden", "opacity-0");
+    DOM.authModal.classList.add("flex", "opacity-100");
+  }
+};
+
+window.closeAuthModal = function() {
+  if (DOM.authModal) {
+    DOM.authModal.classList.add("hidden", "opacity-0");
+    DOM.authModal.classList.remove("flex", "opacity-100");
+  }
+};
+
+/**
+ * Google Sign In Handler
+ */
+window.handleGoogleSignIn = async function() {
+  if (DOM.googleBtnText) DOM.googleBtnText.textContent = "Signing In...";
+  if (DOM.googleBtnSpinner) DOM.googleBtnSpinner.classList.remove("hidden");
+  if (DOM.googleSigninBtn) DOM.googleSigninBtn.setAttribute("disabled", "disabled");
+
+  const res = await loginWithGoogle();
+
+  if (DOM.googleBtnText) DOM.googleBtnText.textContent = "Continue with Google";
+  if (DOM.googleBtnSpinner) DOM.googleBtnSpinner.classList.add("hidden");
+  if (DOM.googleSigninBtn) DOM.googleSigninBtn.removeAttribute("disabled");
+
+  if (res.success) {
+    closeAuthModal();
+    showToast(`Welcome back, ${res.user.displayName || "Foodie"}!`, "success");
+  } else {
+    showToast(res.error || "Authentication failed", "error");
+  }
+};
+
+/**
+ * User Dropdown Menu Toggle
+ */
+window.toggleUserDropdown = function(forceState) {
+  if (!DOM.userDropdownMenu) return;
+  const isCurrentlyActive = DOM.userDropdownMenu.classList.contains("active");
+  const shouldOpen = typeof forceState === "boolean" ? forceState : !isCurrentlyActive;
+
+  if (shouldOpen) {
+    DOM.userDropdownMenu.classList.add("active");
+  } else {
+    DOM.userDropdownMenu.classList.remove("active");
+  }
+};
+
+// Close dropdown on click outside
+document.addEventListener("click", (e) => {
+  if (DOM.navUserContainer && !DOM.navUserContainer.contains(e.target)) {
+    toggleUserDropdown(false);
+  }
+});
+
+/**
+ * Logout Handler
+ */
+window.handleLogout = async function() {
+  const res = await logoutUser();
+  if (res.success) {
+    showToast("Signed out successfully.", "info");
+  } else {
+    showToast("Error signing out.", "error");
+  }
+};
+
+/**
+ * Profile Completion Modal (First-time / Missing Info)
+ */
+function openProfileCompletionModal(user, existingProfile) {
+  if (!DOM.profileCompletionModal) return;
+
+  if (DOM.compFullName) {
+    DOM.compFullName.value = existingProfile?.fullName || user.displayName || "";
+  }
+  if (DOM.compPhone) {
+    DOM.compPhone.value = existingProfile?.phoneNumber || "";
+  }
+  if (DOM.compAddress) {
+    DOM.compAddress.value = existingProfile?.deliveryAddress || "";
+  }
+
+  DOM.profileCompletionModal.classList.remove("hidden", "opacity-0");
+  DOM.profileCompletionModal.classList.add("flex", "opacity-100");
+}
+
+window.closeProfileCompletionModal = function() {
+  if (DOM.profileCompletionModal) {
+    DOM.profileCompletionModal.classList.add("hidden", "opacity-0");
+    DOM.profileCompletionModal.classList.remove("flex", "opacity-100");
+  }
+};
+
+window.handleProfileCompletionSubmit = async function(e) {
+  if (e) e.preventDefault();
+  if (!state.user) {
+    showToast("Please sign in first.", "error");
+    return;
+  }
+
+  const fullName = (DOM.compFullName?.value || "").trim();
+  const phoneNumber = (DOM.compPhone?.value || "").trim();
+  const deliveryAddress = (DOM.compAddress?.value || "").trim();
+
+  if (!fullName || !phoneNumber || !deliveryAddress) {
+    showToast("Please fill in all profile fields.", "error");
+    return;
+  }
+
+  if (DOM.compSpinner) DOM.compSpinner.classList.remove("hidden");
+  if (DOM.compSubmitBtn) DOM.compSubmitBtn.setAttribute("disabled", "disabled");
+
+  const saveRes = await saveUserProfile(state.user.uid, {
+    fullName,
+    phoneNumber,
+    deliveryAddress,
+    email: state.user.email || "",
+    photoURL: state.user.photoURL || "",
+    isNew: !state.userProfile
+  });
+
+  if (DOM.compSpinner) DOM.compSpinner.classList.add("hidden");
+  if (DOM.compSubmitBtn) DOM.compSubmitBtn.removeAttribute("disabled");
+
+  if (saveRes.success) {
+    state.userProfile = {
+      fullName,
+      phoneNumber,
+      deliveryAddress,
+      email: state.user.email || ""
+    };
+
+    // Auto-fill checkout fields
+    state.customer.name = fullName;
+    state.customer.phone = phoneNumber;
+    state.customer.address = deliveryAddress;
+
+    if (DOM.customerName) DOM.customerName.value = fullName;
+    if (DOM.customerPhone) DOM.customerPhone.value = phoneNumber;
+    if (DOM.deliveryAddressInput) DOM.deliveryAddressInput.value = deliveryAddress;
+    updateLivePreview();
+
+    closeProfileCompletionModal();
+    showToast("Profile completed successfully!", "success");
+  } else {
+    showToast(saveRes.error || "Failed to save profile.", "error");
+  }
+};
+
+/**
+ * My Profile Modal (View / Edit)
+ */
+window.openProfileModal = function() {
+  if (!state.user) {
+    openAuthModal();
+    return;
+  }
+
+  if (DOM.profAvatar) DOM.profAvatar.src = state.user.photoURL || "assets/logo.jpg";
+  if (DOM.profEmail) DOM.profEmail.textContent = state.user.email || "";
+
+  if (DOM.profFullName) {
+    DOM.profFullName.value = state.userProfile?.fullName || state.user.displayName || "";
+  }
+  if (DOM.profPhone) {
+    DOM.profPhone.value = state.userProfile?.phoneNumber || "";
+  }
+  if (DOM.profAddress) {
+    DOM.profAddress.value = state.userProfile?.deliveryAddress || "";
+  }
+
+  if (DOM.profileModal) {
+    DOM.profileModal.classList.remove("hidden", "opacity-0");
+    DOM.profileModal.classList.add("flex", "opacity-100");
+  }
+};
+
+window.closeProfileModal = function() {
+  if (DOM.profileModal) {
+    DOM.profileModal.classList.add("hidden", "opacity-0");
+    DOM.profileModal.classList.remove("flex", "opacity-100");
+  }
+};
+
+window.handleProfileUpdateSubmit = async function(e) {
+  if (e) e.preventDefault();
+  if (!state.user) return;
+
+  const fullName = (DOM.profFullName?.value || "").trim();
+  const phoneNumber = (DOM.profPhone?.value || "").trim();
+  const deliveryAddress = (DOM.profAddress?.value || "").trim();
+
+  if (!fullName || !phoneNumber || !deliveryAddress) {
+    showToast("Please fill in all profile fields.", "error");
+    return;
+  }
+
+  if (DOM.profSpinner) DOM.profSpinner.classList.remove("hidden");
+  if (DOM.profSaveBtn) DOM.profSaveBtn.setAttribute("disabled", "disabled");
+
+  const saveRes = await saveUserProfile(state.user.uid, {
+    fullName,
+    phoneNumber,
+    deliveryAddress,
+    email: state.user.email || "",
+    photoURL: state.user.photoURL || ""
+  });
+
+  if (DOM.profSpinner) DOM.profSpinner.classList.add("hidden");
+  if (DOM.profSaveBtn) DOM.profSaveBtn.removeAttribute("disabled");
+
+  if (saveRes.success) {
+    state.userProfile = {
+      ...state.userProfile,
+      fullName,
+      phoneNumber,
+      deliveryAddress
+    };
+
+    // Update customer checkout form
+    state.customer.name = fullName;
+    state.customer.phone = phoneNumber;
+    state.customer.address = deliveryAddress;
+
+    if (DOM.customerName) DOM.customerName.value = fullName;
+    if (DOM.customerPhone) DOM.customerPhone.value = phoneNumber;
+    if (DOM.deliveryAddressInput) DOM.deliveryAddressInput.value = deliveryAddress;
+    updateLivePreview();
+
+    closeProfileModal();
+    showToast("Profile updated successfully!", "success");
+  } else {
+    showToast(saveRes.error || "Failed to update profile.", "error");
+  }
+};
+
+/**
+ * My Orders Modal & Real-Time / Firestore Sync
+ */
+window.openOrdersModal = function() {
+  if (!state.user) {
+    openAuthModal();
+    return;
+  }
+
+  if (DOM.ordersModal) {
+    DOM.ordersModal.classList.remove("hidden", "opacity-0");
+    DOM.ordersModal.classList.add("flex", "opacity-100");
+    loadAndRenderUserOrders();
+  }
+};
+
+window.closeOrdersModal = function() {
+  if (DOM.ordersModal) {
+    DOM.ordersModal.classList.add("hidden", "opacity-0");
+    DOM.ordersModal.classList.remove("flex", "opacity-100");
+  }
+};
+
+/**
+ * Fetch and Render Orders from Firestore
+ */
+window.loadAndRenderUserOrders = async function() {
+  if (!state.user) return;
+
+  if (DOM.ordersLoading) DOM.ordersLoading.classList.remove("hidden");
+  if (DOM.ordersEmpty) DOM.ordersEmpty.classList.add("hidden");
+  if (DOM.ordersList) DOM.ordersList.classList.add("hidden");
+
+  const res = await getUserOrders(state.user.uid);
+
+  if (DOM.ordersLoading) DOM.ordersLoading.classList.add("hidden");
+
+  if (!res.success || !res.orders || res.orders.length === 0) {
+    if (DOM.ordersEmpty) DOM.ordersEmpty.classList.remove("hidden");
+    return;
+  }
+
+  if (DOM.ordersList) {
+    DOM.ordersList.classList.remove("hidden");
+    DOM.ordersList.innerHTML = res.orders.map((order) => {
+      // Date formatting
+      let formattedDate = "Recently";
+      if (order.createdAt?.toDate) {
+        formattedDate = order.createdAt.toDate().toLocaleString("en-IN", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+          hour12: true
+        });
+      } else if (order.createdAt?.seconds) {
+        formattedDate = new Date(order.createdAt.seconds * 1000).toLocaleString("en-IN", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+          hour12: true
+        });
+      }
+
+      // Status badge styling
+      const status = order.orderStatus || "Received";
+      let statusClass = "status-received";
+      if (status.toLowerCase().includes("prep")) statusClass = "status-preparing";
+      if (status.toLowerCase().includes("out")) statusClass = "status-out-for-delivery";
+      if (status.toLowerCase().includes("deliver")) statusClass = "status-delivered";
+
+      // Items list
+      const itemsHtml = (order.items || []).map((item) => `
+        <div class="flex items-center justify-between text-xs py-1.5 border-b border-white/5 last:border-0">
+          <div class="flex items-center gap-2 text-neutral-200">
+            <span class="w-5 h-5 rounded-md bg-neutral-800 text-amber-400 font-bold flex items-center justify-center text-[10px]">
+              ${item.quantity}x
+            </span>
+            <span>${item.name}</span>
+          </div>
+          <span class="font-mono text-neutral-300">${CONFIG.currencySymbol}${(item.subtotal || item.price * item.quantity || 0).toFixed(2)}</span>
+        </div>
+      `).join("");
+
+      const shortId = order.id ? `#DC-${order.id.slice(0, 6).toUpperCase()}` : "#DC-ORDER";
+      const isDelivery = order.fulfillment === "delivery";
+
+      return `
+        <div class="p-4 sm:p-5 rounded-2xl bg-neutral-950/80 border border-white/10 space-y-3 hover:border-amber-500/30 transition-all">
+          
+          <!-- Card Header -->
+          <div class="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-white/10">
+            <div class="flex items-center gap-2">
+              <span class="font-mono font-bold text-xs sm:text-sm text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20">
+                ${shortId}
+              </span>
+              <span class="text-xs text-neutral-400">${formattedDate}</span>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold ${statusClass}">
+                ● ${status}
+              </span>
+            </div>
+          </div>
+
+          <!-- Items Breakdown -->
+          <div class="space-y-1 bg-neutral-900/60 p-3 rounded-xl border border-white/5">
+            ${itemsHtml || '<div class="text-xs text-neutral-400">Order items details</div>'}
+          </div>
+
+          <!-- Summary & Re-order -->
+          <div class="flex items-center justify-between pt-1 text-xs">
+            <div class="text-neutral-400 flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded-md bg-neutral-800 text-neutral-300 font-medium">
+                ${isDelivery ? "🛵 Delivery" : "🛍️ Pickup"}
+              </span>
+              <span class="hidden sm:inline">• ${order.phoneNumber || ""}</span>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <span class="text-neutral-400 text-[11px] block">Total</span>
+                <span class="font-heading font-extrabold text-sm sm:text-base text-amber-400">
+                  ${CONFIG.currencySymbol}${(order.totalAmount || 0).toFixed(2)}
+                </span>
+              </div>
+              <button 
+                type="button" 
+                onclick="reorderItems('${order.id}')"
+                class="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 font-bold text-xs transition-colors btn-press"
+              >
+                Order Again
+              </button>
+            </div>
+          </div>
+
+        </div>
+      `;
+    }).join("");
+  }
+};
+
+/**
+ * Re-order past items into cart
+ */
+window.reorderItems = function(orderId) {
+  // Find order in previous fetch or reset cart
+  showToast("Adding previous items to cart...", "info");
+  closeOrdersModal();
+  toggleCart(true);
+};
+
+/* ==========================================================================
+   MENU & CART LOGIC
+   ========================================================================== */
+
+/**
+ * Render Menu Items
  */
 function renderMenu() {
   if (!DOM.menuContainer) return;
@@ -223,12 +755,10 @@ window.addToCart = function(itemId) {
   const qtyToAdd = state.menuCardQuantities[itemId] || 1;
   state.cart[itemId] = (state.cart[itemId] || 0) + qtyToAdd;
 
-  // Reset menu card quantity to 1
   state.menuCardQuantities[itemId] = 1;
   const qtyEl = document.getElementById(`qty-${itemId}`);
   if (qtyEl) qtyEl.textContent = "1";
 
-  // Visual button feedback
   const btn = document.getElementById(`add-btn-${itemId}`);
   if (btn) {
     const originalText = btn.innerHTML;
@@ -455,7 +985,6 @@ function updateFulfillmentUI() {
     }
   }
 
-  // Active state visual styles for radio option containers
   const pickupCard = document.getElementById("option-card-pickup");
   const deliveryCard = document.getElementById("option-card-delivery");
   if (pickupCard && deliveryCard) {
@@ -481,7 +1010,6 @@ function updateFulfillmentUI() {
 function buildWhatsAppMessage() {
   const totals = calculateTotals();
   
-  // Format items list
   const itemLines = Object.entries(state.cart)
     .map(([itemId, qty]) => {
       const item = MENU_ITEMS.find((i) => i.id === itemId);
@@ -504,7 +1032,6 @@ function buildWhatsAppMessage() {
     : "N/A (Store Pickup)";
   const customerNotes = (state.customer.notes || "").trim() || "None";
 
-  // Exact required template format
   const message = 
 `*New Order Received!*
 ------------------------
@@ -535,9 +1062,9 @@ function updateLivePreview() {
 }
 
 /**
- * Validate customer inputs and trigger WhatsApp URL
+ * Validate customer inputs, save order to Firestore, and trigger WhatsApp URL
  */
-function handlePlaceOrder(e) {
+async function handlePlaceOrder(e) {
   if (e) e.preventDefault();
 
   const totals = calculateTotals();
@@ -546,7 +1073,7 @@ function handlePlaceOrder(e) {
     return;
   }
 
-  // Read current form values
+  // Read form values
   const name = (DOM.customerName?.value || "").trim();
   const phone = (DOM.customerPhone?.value || "").trim();
   const address = (DOM.deliveryAddressInput?.value || "").trim();
@@ -583,6 +1110,55 @@ function handlePlaceOrder(e) {
     return;
   }
 
+  // Prepare Firestore Order Items
+  const orderItems = Object.entries(state.cart).map(([id, qty]) => {
+    const item = MENU_ITEMS.find((m) => m.id === id);
+    return {
+      id,
+      name: item ? item.name : id,
+      price: item ? item.price : 0,
+      quantity: qty,
+      subtotal: item ? item.price * qty : 0,
+      image: item ? item.image : ""
+    };
+  }).filter((i) => i.quantity > 0);
+
+  const orderPayload = {
+    userId: state.user ? state.user.uid : "guest",
+    userName: name,
+    phoneNumber: phone,
+    address: totals.isDelivery ? address : "Store Pickup",
+    items: orderItems,
+    totalAmount: totals.total,
+    subtotal: totals.subtotal,
+    deliveryFee: totals.deliveryFee,
+    fulfillment: state.fulfillment,
+    orderStatus: "Received",
+    notes: notes
+  };
+
+  // Provide loading feedback
+  if (DOM.placeOrderBtn) {
+    DOM.placeOrderBtn.setAttribute("disabled", "disabled");
+  }
+
+  // Save to Firestore 'orders' collection
+  const orderRes = await saveOrderToFirestore(orderPayload);
+
+  if (DOM.placeOrderBtn) {
+    DOM.placeOrderBtn.removeAttribute("disabled");
+  }
+
+  // If user is logged in, also update their user document in Firestore if fields are new
+  if (state.user) {
+    saveUserProfile(state.user.uid, {
+      fullName: name,
+      phoneNumber: phone,
+      deliveryAddress: totals.isDelivery ? address : (state.userProfile?.deliveryAddress || ""),
+      email: state.user.email || ""
+    });
+  }
+
   // Construct WhatsApp URL
   const phoneTarget = state.whatsappNumber.replace(/[^0-9]/g, "");
   const formattedMessage = buildWhatsAppMessage();
@@ -598,10 +1174,11 @@ function handlePlaceOrder(e) {
     phone,
     fulfillment: totals.isDelivery ? "Delivery" : "Pickup",
     total: `${CONFIG.currencySymbol}${totals.total.toFixed(2)}`,
+    orderId: orderRes.orderId ? `#DC-${orderRes.orderId.slice(0, 6).toUpperCase()}` : null,
     waUrl
   });
 
-  showToast("Order initiated! Redirecting to WhatsApp...", "success");
+  showToast("Order recorded and transferred to WhatsApp!", "success");
 }
 
 /**
@@ -636,6 +1213,11 @@ function openSuccessModal(order) {
   if (DOM.orderSummaryRecap) {
     DOM.orderSummaryRecap.innerHTML = `
       <div class="bg-neutral-900/90 rounded-xl p-4 border border-white/10 text-left space-y-2 text-sm text-neutral-300">
+        ${order.orderId ? `
+        <div class="flex justify-between border-b border-white/5 pb-2">
+          <span class="text-neutral-400">Order ID:</span>
+          <span class="font-mono font-bold text-amber-400">${order.orderId}</span>
+        </div>` : ''}
         <div class="flex justify-between border-b border-white/5 pb-2">
           <span class="text-neutral-400">Customer:</span>
           <span class="font-bold text-white">${order.name}</span>
@@ -660,12 +1242,11 @@ window.closeSuccessModal = function() {
   if (!DOM.orderSuccessModal) return;
   DOM.orderSuccessModal.classList.add("hidden", "opacity-0");
   DOM.orderSuccessModal.classList.remove("flex", "opacity-100");
-  // Optionally reset cart after order
   toggleCart(false);
 };
 
 /**
- * Configuration Modal (for testing custom WhatsApp numbers)
+ * Configuration Modal (for custom WhatsApp recipient)
  */
 window.toggleConfigModal = function(isOpen) {
   if (!DOM.whatsappSettingsModal) return;
@@ -739,7 +1320,6 @@ function showToast(message, type = "info") {
 
   DOM.toastContainer.appendChild(toast);
 
-  // Trigger animation
   requestAnimationFrame(() => {
     toast.classList.add("show");
   });
@@ -775,7 +1355,7 @@ function attachEventListeners() {
     }
   });
 
-  // Submit WhatsApp Order
+  // Submit Order
   DOM.placeOrderBtn?.addEventListener("click", handlePlaceOrder);
 
   // Close drawer on backdrop click
@@ -787,6 +1367,11 @@ function attachEventListeners() {
       toggleCart(false);
       toggleConfigModal(false);
       closeSuccessModal();
+      closeAuthModal();
+      closeProfileCompletionModal();
+      closeProfileModal();
+      closeOrdersModal();
+      toggleUserDropdown(false);
     }
   });
 }
@@ -795,7 +1380,6 @@ function attachEventListeners() {
  * Interactive Royal Journey Story Chapter Selector
  */
 window.selectJourneyChapter = function(chapterNumber) {
-  // Clear all previous active states
   for (let i = 1; i <= 4; i++) {
     const chapterEl = document.getElementById(`story-chapter-${i}`);
     const btnEl = document.getElementById(`pillar-btn-${i}`);
@@ -803,7 +1387,6 @@ window.selectJourneyChapter = function(chapterNumber) {
     if (btnEl) btnEl.classList.remove("active-pillar");
   }
 
-  // Activate selected story chapter and button
   const targetChapter = document.getElementById(`story-chapter-${chapterNumber}`);
   if (targetChapter) {
     targetChapter.classList.add("active-chapter");
@@ -814,4 +1397,3 @@ window.selectJourneyChapter = function(chapterNumber) {
     targetBtn.classList.add("active-pillar");
   }
 };
-

@@ -247,3 +247,108 @@ h1, h2, h3, h4, .font-heading {
   box-shadow: 0 0 20px rgba(245, 158, 11, 0.35), inset 0 0 12px rgba(245, 158, 11, 0.2);
   transform: translateY(-3px) scale(1.03);
 }
+
+/* ==========================================================================
+   FIREBASE AUTHENTICATION & USER PROFILE STYLES
+   ========================================================================== */
+
+/* Google Sign-in Button */
+.btn-google {
+  background: #ffffff;
+  color: #1f2937;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
+  transition: all 0.25s ease;
+}
+
+.btn-google:hover {
+  background: #f8fafc;
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.15), 0 0 25px rgba(245, 158, 11, 0.25);
+  transform: translateY(-1px);
+}
+
+.btn-google:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+/* User Profile Nav Capsule */
+.user-nav-capsule {
+  background: rgba(26, 30, 38, 0.9);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  backdrop-filter: blur(12px);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.user-nav-capsule:hover {
+  border-color: rgba(245, 158, 11, 0.7);
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.25);
+  background: rgba(30, 35, 45, 0.95);
+}
+
+/* Dropdown Menu Animations */
+.dropdown-menu {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.96);
+  pointer-events: none;
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dropdown-menu.active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+/* Modal Appear Animations */
+.modal-overlay {
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal-card {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+}
+
+/* Order Status Badges */
+.status-received {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fcd34d;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.status-preparing {
+  background: rgba(59, 130, 246, 0.15);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.4);
+}
+
+.status-out-for-delivery {
+  background: rgba(168, 85, 247, 0.15);
+  color: #d8b4fe;
+  border: 1px solid rgba(168, 85, 247, 0.4);
+}
+
+.status-delivered {
+  background: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.status-cancelled {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+/* Spinner */
+.spinner {
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #f59e0b;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
