@@ -48,13 +48,13 @@ Click on the **WhatsApp pill button** (`+919030243334`) in the top navigation ba
 *New Order Received!*
 ------------------------
 *Items:*
-- South Indian Dum Biryani x 2 - ₹260.00
-- Fry Piece Biryani x 1 - ₹130.00
+- South Indian Dum Biryani x 2 - ₹240.00
+- Fry Piece Biryani x 1 - ₹120.00
 
 *Fulfillment:* Delivery
-*Subtotal:* ₹390.00
+*Subtotal:* ₹360.00
 *Delivery Fee:* ₹10.00
-*Total Amount:* ₹400.00
+*Total Amount:* ₹370.00
 
 *Customer Details:*
 Name: Alex Morgan

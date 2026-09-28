@@ -31,7 +31,7 @@ const MENU_ITEMS = [
     tag: "⭐ Chef's Signature",
     tagClass: "bg-amber-500/15 text-amber-300 border-amber-500/30",
     description: "Authentic slow-cooked handi dum biryani layered with fragrant aged basmati rice, tender spiced marinated chicken, saffron milk, caramelized birista, fresh mint & boiled egg. Served with mirchi ka salan & raita.",
-    price: 130.00,
+    price: 120.00,
     image: "assets/dum_biryani.jpg",
     calories: "720 kcal"
   },
@@ -41,7 +41,7 @@ const MENU_ITEMS = [
     tag: "🔥 Andhra Special",
     tagClass: "bg-red-500/15 text-red-300 border-red-500/30",
     description: "Signature Andhra-style aromatic flavored biryani rice topped with crispy golden spiced fried chicken chunks, roasted cashews, fresh curry leaves, and green chilies. Served with salan & raita.",
-    price: 130.00,
+    price: 120.00,
     image: "assets/fry_piece_biryani.jpg",
     calories: "760 kcal"
   }
