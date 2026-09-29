@@ -15,30 +15,26 @@ A clean, conversion-focused single-page food ordering website with a curated 2-i
 - **Form Validation**: Validates Customer Name, Phone Number, and Delivery Address before checkout.
 - **WhatsApp Integration**: Generates the exact formatted message and opens `https://wa.me/{PHONE_NUMBER}?text={ENCODED_MESSAGE}`.
 - **Live WhatsApp Message Preview**: Accordion inside the cart drawer lets customers preview the text before submitting.
-- **WhatsApp Phone Settings**: Change the recipient phone number dynamically in the UI or in `app.js`.
+- **WhatsApp Phone Configuration**: Change the recipient phone number directly in `app.js`.
 
 ---
 
-## 📱 WhatsApp Configuration (Where to insert your phone number)
+## 📱 WhatsApp Configuration (Where to change your phone number)
 
-There are **two easy ways** to set your WhatsApp phone number:
+The recipient WhatsApp number is configured directly in the codebase for security and consistency:
 
-### Method 1: Directly in Code (`app.js`)
-Open [app.js](file:///c:/Users/Srinivas/OneDrive/Desktop/New%20folder/app.js) and update line 10 with your international phone number (digits only, including country code, without `+` or spaces):
+Open [app.js](file:///c:/Users/Srinivas/OneDrive/Desktop/Dum%20Culture/app.js) and update `defaultWhatsappNumber` in `CONFIG` with your phone number (digits only with country code, e.g., `+919030243334`):
 
 ```javascript
 const CONFIG = {
-  restaurantName: "Dum Theory",
-  // Replace with your WhatsApp phone number (e.g. 919030243334):
+  restaurantName: "Dum Culture",
+  // Replace with your WhatsApp phone number:
   defaultWhatsappNumber: "+919030243334", 
   deliveryFee: 10.00,
   currencySymbol: "₹",
   // ...
 };
 ```
-
-### Method 2: Live via UI
-Click on the **WhatsApp pill button** (`+919030243334`) in the top navigation bar to open the configuration modal and enter any phone number. It will be saved instantly to `localStorage`.
 
 ---
 

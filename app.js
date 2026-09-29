@@ -57,7 +57,7 @@ const state = {
     fry_piece_biryani: 1
   },
   fulfillment: "delivery", // 'pickup' | 'delivery'
-  whatsappNumber: localStorage.getItem("dum_theory_whatsapp_phone") || localStorage.getItem("umami_whatsapp_phone") || CONFIG.defaultWhatsappNumber,
+  whatsappNumber: CONFIG.defaultWhatsappNumber,
   customer: {
     name: "",
     phone: "",
@@ -76,7 +76,6 @@ document.addEventListener("DOMContentLoaded", () => {
   attachEventListeners();
   updateFulfillmentUI();
   updateCartUI();
-  renderConfigUI();
   initAuthObserver();
 });
 
@@ -151,10 +150,7 @@ function cacheDOM() {
   DOM.ordersEmpty = document.getElementById("orders-empty");
   DOM.ordersList = document.getElementById("orders-list");
 
-  // WhatsApp Config & Confirmation Modals
-  DOM.whatsappSettingsModal = document.getElementById("whatsapp-settings-modal");
-  DOM.whatsappNumberInput = document.getElementById("whatsapp-number-input");
-  DOM.currentWhatsappDisplay = document.getElementById("current-whatsapp-display");
+  // Order Confirmation & Toasts
   DOM.orderSuccessModal = document.getElementById("order-success-modal");
   DOM.orderSummaryRecap = document.getElementById("order-summary-recap");
   DOM.toastContainer = document.getElementById("toast-container");
@@ -1245,41 +1241,6 @@ window.closeSuccessModal = function() {
   toggleCart(false);
 };
 
-/**
- * Configuration Modal (for custom WhatsApp recipient)
- */
-window.toggleConfigModal = function(isOpen) {
-  if (!DOM.whatsappSettingsModal) return;
-  if (isOpen) {
-    if (DOM.whatsappNumberInput) DOM.whatsappNumberInput.value = state.whatsappNumber;
-    DOM.whatsappSettingsModal.classList.remove("hidden", "opacity-0");
-    DOM.whatsappSettingsModal.classList.add("flex", "opacity-100");
-  } else {
-    DOM.whatsappSettingsModal.classList.add("hidden", "opacity-0");
-    DOM.whatsappSettingsModal.classList.remove("flex", "opacity-100");
-  }
-};
-
-window.saveWhatsappSettings = function(e) {
-  if (e) e.preventDefault();
-  const input = DOM.whatsappNumberInput?.value.replace(/[^0-9]/g, "");
-  if (!input || input.length < 7) {
-    showToast("Please enter a valid phone number (digits only with country code).", "error");
-    return;
-  }
-
-  state.whatsappNumber = input;
-  localStorage.setItem("dum_theory_whatsapp_phone", input);
-  renderConfigUI();
-  toggleConfigModal(false);
-  showToast(`WhatsApp recipient updated to +${input}!`, "success");
-};
-
-function renderConfigUI() {
-  if (DOM.currentWhatsappDisplay) {
-    DOM.currentWhatsappDisplay.textContent = `+${state.whatsappNumber}`;
-  }
-}
 
 /**
  * Toast System
@@ -1365,7 +1326,6 @@ function attachEventListeners() {
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       toggleCart(false);
-      toggleConfigModal(false);
       closeSuccessModal();
       closeAuthModal();
       closeProfileCompletionModal();
