@@ -887,29 +887,29 @@ function updateCartUI() {
           if (!item || qty <= 0) return "";
           const itemTotal = (item.price * qty).toFixed(2);
           return `
-            <li class="flex items-center gap-3.5 p-3 rounded-xl bg-neutral-900/80 border border-white/5 group hover:border-white/15 transition-all">
-              <img src="${item.image}" alt="${item.name}" class="w-16 h-16 rounded-lg object-cover flex-shrink-0" />
-              <div class="flex-1 min-w-0">
-                <h4 class="font-bold text-sm text-white truncate font-heading">${item.name}</h4>
-                <div class="text-xs text-neutral-400 mt-0.5">${CONFIG.currencySymbol}${item.price.toFixed(2)} each</div>
-                <div class="text-amber-400 font-extrabold text-sm mt-1">${CONFIG.currencySymbol}${itemTotal}</div>
+            <li class="flex items-center gap-2.5 sm:gap-3.5 p-2.5 sm:p-3 rounded-xl bg-neutral-900/80 border border-white/5 group hover:border-white/15 transition-all">
+              <img src="${item.image}" alt="${item.name}" class="w-14 h-14 sm:w-16 sm:h-16 rounded-lg object-cover flex-shrink-0" />
+              <div class="flex-1 min-w-0 pr-1">
+                <h4 class="font-bold text-xs sm:text-sm text-white truncate font-heading">${item.name}</h4>
+                <div class="text-[11px] sm:text-xs text-neutral-400 mt-0.5">${CONFIG.currencySymbol}${item.price.toFixed(2)} each</div>
+                <div class="text-amber-400 font-extrabold text-xs sm:text-sm mt-0.5">${CONFIG.currencySymbol}${itemTotal}</div>
               </div>
               
               <!-- Quantity Modifier -->
-              <div class="flex items-center gap-1 bg-neutral-800 rounded-lg p-1 border border-white/10">
+              <div class="flex items-center gap-0.5 sm:gap-1 bg-neutral-800 rounded-lg p-0.5 sm:p-1 border border-white/10 shrink-0">
                 <button 
                   type="button" 
                   onclick="updateCartItemQty('${item.id}', -1)"
-                  class="w-7 h-7 rounded flex items-center justify-center text-neutral-300 hover:text-white hover:bg-neutral-700 text-sm font-bold btn-press"
+                  class="w-6 h-6 sm:w-7 sm:h-7 rounded flex items-center justify-center text-neutral-300 hover:text-white hover:bg-neutral-700 text-xs sm:text-sm font-bold btn-press"
                   aria-label="Decrease quantity"
                 >
                   -
                 </button>
-                <span class="w-6 text-center text-xs font-bold text-white select-none">${qty}</span>
+                <span class="w-5 sm:w-6 text-center text-xs font-bold text-white select-none">${qty}</span>
                 <button 
                   type="button" 
                   onclick="updateCartItemQty('${item.id}', 1)"
-                  class="w-7 h-7 rounded flex items-center justify-center text-neutral-300 hover:text-white hover:bg-neutral-700 text-sm font-bold btn-press"
+                  class="w-6 h-6 sm:w-7 sm:h-7 rounded flex items-center justify-center text-neutral-300 hover:text-white hover:bg-neutral-700 text-xs sm:text-sm font-bold btn-press"
                   aria-label="Increase quantity"
                 >
                   +
@@ -920,7 +920,7 @@ function updateCartUI() {
               <button 
                 type="button" 
                 onclick="removeCartItem('${item.id}')"
-                class="text-neutral-500 hover:text-red-400 p-1.5 rounded-lg hover:bg-red-500/10 transition-colors"
+                class="text-neutral-500 hover:text-red-400 p-1 sm:p-1.5 rounded-lg hover:bg-red-500/10 transition-colors shrink-0"
                 title="Remove item"
                 aria-label="Remove ${item.name}"
               >
