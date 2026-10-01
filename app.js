@@ -20,7 +20,14 @@ const CONFIG = {
   deliveryFee: 10.00,
   currencySymbol: "₹",
   estimatedPickupTime: "10-15 mins",
-  estimatedDeliveryTime: "25-35 mins"
+  estimatedDeliveryTime: "25-35 mins",
+  // Operational Hours (IST - Indian Standard Time)
+  openingHour: 9,        // 9:00 AM IST
+  openingMinute: 0,
+  closingHour: 11,       // 11:30 AM IST
+  closingMinute: 30,
+  openingTimeFormatted: "9:00 AM IST",
+  closingTimeFormatted: "11:30 AM IST"
 };
 
 // Menu Data (Signature Biryanis)
@@ -77,6 +84,9 @@ document.addEventListener("DOMContentLoaded", () => {
   updateFulfillmentUI();
   updateCartUI();
   initAuthObserver();
+  updateStoreStatusUI();
+  // Live status update every 30 seconds
+  setInterval(updateStoreStatusUI, 30000);
 });
 
 /**
@@ -110,6 +120,12 @@ function cacheDOM() {
   DOM.customerPhone = document.getElementById("customer-phone");
   DOM.customerNotes = document.getElementById("customer-notes");
   DOM.placeOrderBtn = document.getElementById("place-order-btn");
+  DOM.cartClosedNotice = document.getElementById("cart-closed-notice");
+  
+  // Kitchen Live Status
+  DOM.kitchenStatusPill = document.getElementById("kitchen-status-pill");
+  DOM.kitchenStatusDot = document.getElementById("kitchen-status-dot");
+  DOM.kitchenStatusText = document.getElementById("kitchen-status-text");
   
   // Navigation Auth Elements
   DOM.navLoginBtn = document.getElementById("nav-login-btn");
@@ -643,9 +659,9 @@ function renderMenu() {
   DOM.menuContainer.innerHTML = MENU_ITEMS.map((item) => {
     const qty = state.menuCardQuantities[item.id] || 1;
     return `
-      <article class="glass-card rounded-2xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1.5 group border border-white/10" id="card-${item.id}">
+      <article class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1.5 group border border-white/10" id="card-${item.id}">
         <!-- Food Image Container -->
-        <div class="relative h-60 w-full overflow-hidden bg-neutral-900">
+        <div class="relative h-52 sm:h-60 w-full overflow-hidden bg-neutral-900">
           <img 
             src="${item.image}" 
             alt="${item.name}" 
@@ -655,52 +671,52 @@ function renderMenu() {
           <div class="absolute inset-0 bg-gradient-to-t from-[#12151a] via-transparent to-black/20 pointer-events-none"></div>
           
           <!-- Badge -->
-          <span class="absolute top-3.5 left-3.5 px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-md border ${item.tagClass}">
+          <span class="absolute top-3 left-3 sm:top-3.5 sm:left-3.5 px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-semibold backdrop-blur-md border ${item.tagClass}">
             ${item.tag}
           </span>
           
           <!-- Calorie / Info Badge -->
-          <span class="absolute top-3.5 right-3.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-black/60 backdrop-blur-md text-neutral-300 border border-white/10">
+          <span class="absolute top-3 right-3 sm:top-3.5 sm:right-3.5 px-2 sm:px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-medium bg-black/60 backdrop-blur-md text-neutral-300 border border-white/10">
             ${item.calories}
           </span>
 
           <!-- Price Overlay -->
-          <div class="absolute bottom-3 right-3 bg-amber-500 text-neutral-950 font-extrabold px-3.5 py-1.5 rounded-xl text-lg shadow-lg font-heading tracking-tight">
+          <div class="absolute bottom-3 right-3 bg-amber-500 text-neutral-950 font-extrabold px-3 sm:px-3.5 py-1 sm:py-1.5 rounded-xl text-base sm:text-lg shadow-lg font-heading tracking-tight">
             ${CONFIG.currencySymbol}${item.price.toFixed(2)}
           </div>
         </div>
 
         <!-- Content Details -->
-        <div class="p-6 flex-1 flex flex-col justify-between">
+        <div class="p-4 sm:p-6 flex-1 flex flex-col justify-between">
           <div>
-            <h3 class="text-xl font-bold text-white mb-2 font-heading group-hover:text-amber-400 transition-colors">
+            <h3 class="text-lg sm:text-xl font-bold text-white mb-1.5 sm:mb-2 font-heading group-hover:text-amber-400 transition-colors">
               ${item.name}
             </h3>
-            <p class="text-neutral-400 text-sm leading-relaxed mb-6 line-clamp-3">
+            <p class="text-neutral-400 text-xs sm:text-sm leading-relaxed mb-5 sm:mb-6 line-clamp-3">
               ${item.description}
             </p>
           </div>
 
           <!-- Card Actions (Quantity selector + Add button) -->
-          <div class="pt-4 border-t border-white/5 flex items-center justify-between gap-3">
+          <div class="pt-3.5 sm:pt-4 border-t border-white/5 flex items-center justify-between gap-2.5 sm:gap-3">
             <!-- Counter -->
-            <div class="flex items-center bg-neutral-800/90 rounded-xl p-1 border border-white/10">
+            <div class="flex items-center bg-neutral-800/90 rounded-xl p-0.5 sm:p-1 border border-white/10 shrink-0">
               <button 
                 type="button"
                 onclick="changeMenuQty('${item.id}', -1)"
                 aria-label="Decrease quantity for ${item.name}"
-                class="w-8 h-8 flex items-center justify-center rounded-lg text-neutral-300 hover:text-white hover:bg-neutral-700/80 transition-colors btn-press text-lg font-bold"
+                class="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-lg text-neutral-300 hover:text-white hover:bg-neutral-700/80 transition-colors btn-press text-base sm:text-lg font-bold"
               >
                 -
               </button>
-              <span id="qty-${item.id}" class="w-8 text-center font-bold text-sm text-white font-heading select-none">
+              <span id="qty-${item.id}" class="w-7 sm:w-8 text-center font-bold text-xs sm:text-sm text-white font-heading select-none">
                 ${qty}
               </span>
               <button 
                 type="button"
                 onclick="changeMenuQty('${item.id}', 1)"
                 aria-label="Increase quantity for ${item.name}"
-                class="w-8 h-8 flex items-center justify-center rounded-lg text-neutral-300 hover:text-white hover:bg-neutral-700/80 transition-colors btn-press text-lg font-bold"
+                class="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-lg text-neutral-300 hover:text-white hover:bg-neutral-700/80 transition-colors btn-press text-base sm:text-lg font-bold"
               >
                 +
               </button>
@@ -711,9 +727,9 @@ function renderMenu() {
               type="button"
               onclick="addToCart('${item.id}')"
               id="add-btn-${item.id}"
-              class="flex-1 bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold py-2.5 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 btn-press shadow-md shadow-amber-500/20 text-sm"
+              class="flex-1 bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold py-2.5 sm:py-3 px-3 sm:px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-1.5 sm:gap-2 btn-press shadow-md shadow-amber-500/20 text-xs sm:text-sm"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-2Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>
               </svg>
               <span>Add to Cart</span>
@@ -1058,10 +1074,79 @@ function updateLivePreview() {
 }
 
 /**
+ * Calculate whether ordering is currently active in Indian Standard Time (IST).
+ * Active window: 9:00 AM – 11:30 AM IST.
+ */
+function getStoreOperationalStatus() {
+  const now = new Date();
+  
+  // Convert current time to Asia/Kolkata (IST, UTC+5:30)
+  const istFormatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Kolkata",
+    hour12: false,
+    hour: "numeric",
+    minute: "numeric"
+  });
+  
+  const parts = istFormatter.formatToParts(now);
+  const hour = parseInt(parts.find((p) => p.type === "hour")?.value || "0", 10);
+  const minute = parseInt(parts.find((p) => p.type === "minute")?.value || "0", 10);
+  const totalMinutes = hour * 60 + minute;
+  
+  const openMinutes = (CONFIG.openingHour ?? 9) * 60 + (CONFIG.openingMinute ?? 0);
+  const closeMinutes = (CONFIG.closingHour ?? 11) * 60 + (CONFIG.closingMinute ?? 30);
+  
+  const isOpen = totalMinutes >= openMinutes && totalMinutes < closeMinutes;
+  
+  return {
+    isOpen,
+    currentHour: hour,
+    currentMinute: minute,
+    currentTimeFormatted: `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")} IST`
+  };
+}
+
+/**
+ * Update UI according to operational status
+ */
+function updateStoreStatusUI() {
+  const status = getStoreOperationalStatus();
+  
+  // Header Pill
+  if (DOM.kitchenStatusPill && DOM.kitchenStatusText && DOM.kitchenStatusDot) {
+    if (status.isOpen) {
+      DOM.kitchenStatusPill.className = "hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold";
+      DOM.kitchenStatusDot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-ping";
+      DOM.kitchenStatusText.textContent = `Kitchen Open • Ready in 15-25m`;
+    } else {
+      DOM.kitchenStatusPill.className = "hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-400 text-xs font-semibold";
+      DOM.kitchenStatusDot.className = "w-2 h-2 rounded-full bg-rose-500";
+      DOM.kitchenStatusText.textContent = `Kitchen Closed • Opens at ${CONFIG.openingTimeFormatted}`;
+    }
+  }
+
+  // Cart Drawer Closed Notice
+  if (DOM.cartClosedNotice) {
+    if (status.isOpen) {
+      DOM.cartClosedNotice.classList.add("hidden");
+    } else {
+      DOM.cartClosedNotice.classList.remove("hidden");
+    }
+  }
+}
+
+/**
  * Validate customer inputs, save order to Firestore, and trigger WhatsApp URL
  */
 async function handlePlaceOrder(e) {
   if (e) e.preventDefault();
+
+  // Enforce IST Timing Window (9:00 AM - 11:30 AM IST)
+  const storeStatus = getStoreOperationalStatus();
+  if (!storeStatus.isOpen) {
+    showToast(`Ordering is currently closed. We accept WhatsApp orders between ${CONFIG.openingTimeFormatted} and ${CONFIG.closingTimeFormatted}.`, "error");
+    return;
+  }
 
   const totals = calculateTotals();
   if (totals.itemCount === 0) {
