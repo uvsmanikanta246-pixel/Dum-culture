@@ -24,10 +24,10 @@ const CONFIG = {
   // Operational Hours (IST - Indian Standard Time)
   openingHour: 9,        // 9:00 AM IST
   openingMinute: 0,
-  closingHour: 11,       // 11:30 AM IST
-  closingMinute: 30,
+  closingHour: 11,       // 11:45 AM IST
+  closingMinute: 45,
   openingTimeFormatted: "9:00 AM IST",
-  closingTimeFormatted: "11:30 AM IST"
+  closingTimeFormatted: "11:45 AM IST"
 };
 
 // Menu Data (Signature Biryanis)
@@ -1075,7 +1075,7 @@ function updateLivePreview() {
 
 /**
  * Calculate whether ordering is currently active in Indian Standard Time (IST).
- * Active window: 9:00 AM – 11:30 AM IST.
+ * Active window: 9:00 AM – 11:45 AM IST.
  */
 function getStoreOperationalStatus() {
   const now = new Date();
@@ -1094,7 +1094,7 @@ function getStoreOperationalStatus() {
   const totalMinutes = hour * 60 + minute;
   
   const openMinutes = (CONFIG.openingHour ?? 9) * 60 + (CONFIG.openingMinute ?? 0);
-  const closeMinutes = (CONFIG.closingHour ?? 11) * 60 + (CONFIG.closingMinute ?? 30);
+  const closeMinutes = (CONFIG.closingHour ?? 11) * 60 + (CONFIG.closingMinute ?? 45);
   
   const isOpen = totalMinutes >= openMinutes && totalMinutes < closeMinutes;
   
@@ -1141,7 +1141,7 @@ function updateStoreStatusUI() {
 async function handlePlaceOrder(e) {
   if (e) e.preventDefault();
 
-  // Enforce IST Timing Window (9:00 AM - 11:30 AM IST)
+  // Enforce IST Timing Window (9:00 AM - 11:45 AM IST)
   const storeStatus = getStoreOperationalStatus();
   if (!storeStatus.isOpen) {
     showToast(`Ordering is currently closed. We accept WhatsApp orders between ${CONFIG.openingTimeFormatted} and ${CONFIG.closingTimeFormatted}.`, "error");
